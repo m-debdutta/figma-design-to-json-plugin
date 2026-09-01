@@ -229,6 +229,8 @@ npm run typecheck # tsc, no emit
 npm run watch     # rebundle on every save
 npm run lint      # eslint
 npm run lint:fix  # eslint with autofix
+npm test          # run the unit tests once
+npm run test:watch # re-run tests on every save
 ```
 
 `code.js` is generated (bundled by [esbuild](https://esbuild.github.io/)) and is
@@ -252,6 +254,8 @@ figma-json-exporter/
     ├── manifest.json         # Dev Mode only, codegen capability, the two language options
     ├── package.json
     ├── tsconfig.json          # strict, type-checking only — bundling is esbuild's job
+    ├── tsconfig.test.json     # type-checks the *.test.ts files kept out of the production build
+    ├── vitest.config.mts
     ├── eslint.config.js
     ├── code.js                # bundled output Figma loads (generated, gitignored)
     └── src/
@@ -260,6 +264,9 @@ figma-json-exporter/
         ├── config.ts          # tunable limits and feature flags
         ├── types.ts           # shared JSON tree types
         ├── format.ts          # number/colour/name formatting helpers
+        ├── *.test.ts          # unit tests, colocated with the module they cover
+        ├── test/
+        │   └── figma-stub.ts  # minimal `figma` global stub used by the tests
         ├── extract/           # phase 1: walks the scene graph into a plain JSON tree
         │   ├── walk.ts
         │   ├── paint.ts
@@ -276,3 +283,14 @@ figma-json-exporter/
 The two entries under `codegenLanguages` in `manifest.json` are what populate the Inspect
 panel dropdown. Their `value` (`summary` and `rest`) is what the handler in `src/main.ts`
 branches on via `event.language`, so if you rename one, update it to match.
+
+### Tests
+
+Unit tests ([Vitest](https://vitest.dev/)) live next to the code they cover, as
+`*.test.ts` files under `src/`. They target the parts of the pipeline that are pure
+transformations of JSON — `format`, `types`, and every pass under `refine/` — using a
+minimal `figma` global stub (`src/test/figma-stub.ts`) instead of a real Figma document.
+`extract/` and `serialize.ts` are thin glue over the real Figma Plugin API and are instead
+exercised by hand in Dev Mode. Test files are excluded from the production `tsconfig.json`
+and type-checked separately via `tsconfig.test.json`, so pulling in test-only types never
+affects the shipped bundle.

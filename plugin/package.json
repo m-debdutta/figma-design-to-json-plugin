@@ -4,12 +4,14 @@
   "description": "Your Figma Plugin",
   "main": "code.js",
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
     "bundle": "esbuild src/main.ts --bundle --outfile=code.js --target=es2020 --format=iife",
     "build": "npm run typecheck && npm run bundle",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "watch": "npm run bundle -- --watch"
+    "watch": "npm run bundle -- --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "author": "",
   "license": "",
@@ -20,6 +22,7 @@
     "esbuild": "^0.28.2",
     "eslint": "^9.39.4",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.57.1"
+    "typescript-eslint": "^8.57.1",
+    "vitest": "^4.1.11"
   }
 }

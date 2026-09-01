@@ -240,18 +240,38 @@ requires a full re-import rather than a reload.
 
 ### Layout
 
-| Path | Purpose |
-| --- | --- |
-| `src/main.ts` | Entry point — the `figma.codegen.on('generate', …)` handler |
-| `src/serialize.ts` | Ties the extract + refine phases together into the two codegen outputs |
-| `src/extract/` | Phase 1 — walks the scene graph into a plain JSON tree (`walk.ts`, plus paint/layout/effects/text helpers) |
-| `src/refine/` | Phase 2 — ordered passes over that tree: `tokens.ts`, `sizes.ts`, `components.ts`, `polish.ts` |
-| `src/config.ts` | Tunable limits and feature flags |
-| `src/types.ts`, `src/format.ts` | Shared JSON types and formatting helpers |
-| `code.js` | Bundled output that Figma loads (generated, gitignored) |
-| `manifest.json` | Plugin config: Dev Mode only, codegen capability, the two language options |
-| `tsconfig.json` | TypeScript config (strict, type-checking only — bundling is esbuild's job) |
-| `eslint.config.js` | Lint rules, including Figma's plugin rules |
+```
+figma-json-exporter/
+├── README.md
+├── AI-READABILITY-ANALYSIS.md
+├── samples/                 # example exports used for the comparisons in this README
+│   ├── my-figma-json.json
+│   ├── published-figma-json.json
+│   └── json-format-comparison.md
+└── plugin/
+    ├── manifest.json         # Dev Mode only, codegen capability, the two language options
+    ├── package.json
+    ├── tsconfig.json          # strict, type-checking only — bundling is esbuild's job
+    ├── eslint.config.js
+    ├── code.js                # bundled output Figma loads (generated, gitignored)
+    └── src/
+        ├── main.ts            # entry point — the figma.codegen.on('generate', …) handler
+        ├── serialize.ts       # ties extract + refine together into the two codegen outputs
+        ├── config.ts          # tunable limits and feature flags
+        ├── types.ts           # shared JSON tree types
+        ├── format.ts          # number/colour/name formatting helpers
+        ├── extract/           # phase 1: walks the scene graph into a plain JSON tree
+        │   ├── walk.ts
+        │   ├── paint.ts
+        │   ├── layout.ts
+        │   ├── effects.ts
+        │   └── text.ts
+        └── refine/            # phase 2: ordered passes over that tree
+            ├── tokens.ts
+            ├── sizes.ts
+            ├── components.ts
+            └── polish.ts
+```
 
 The two entries under `codegenLanguages` in `manifest.json` are what populate the Inspect
 panel dropdown. Their `value` (`summary` and `rest`) is what the handler in `src/main.ts`

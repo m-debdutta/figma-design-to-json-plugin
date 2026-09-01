@@ -1,6 +1,7 @@
 // Dev Mode codegen plugin: emits a JSON representation of the inspected node
 // in the Inspect panel. The language dropdown chooses between a compact
 // hand-built summary and Figma's full REST-shaped export.
+/// <reference types="@figma/plugin-typings" />
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json }
 

@@ -36,8 +36,9 @@ plugin.
    npm run build
    ```
 
-   This compiles `code.ts` into `code.js`. **Figma loads `code.js`, not `code.ts`** — if you
-   skip this step the plugin throws `This plugin template uses TypeScript…` on load.
+   This type-checks and bundles the TypeScript sources under `src/` into a single
+   `code.js`. **Figma loads `code.js`, not the TypeScript sources** — if you skip this step
+   the plugin throws `This plugin template uses TypeScript…` on load.
 
 2. In the Figma desktop app, open any design file.
 3. Go to **Plugins → Development → Import plugin from manifest…**
@@ -203,7 +204,7 @@ error asking you to select a smaller layer, rather than freezing the panel.
 **Errors are shown, not swallowed.** If anything fails, the panel shows an `Error` section
 containing the message instead of going blank.
 
-The knobs all live together at the top of `code.ts`:
+The knobs all live together in [plugin/src/config.ts](plugin/src/config.ts):
 
 | Constant | Default | Effect |
 | --- | --- | --- |
@@ -222,14 +223,16 @@ directory.
 
 ```bash
 cd plugin
-npm install      # once
-npm run build    # compile code.ts -> code.js
-npm run watch    # recompile on every save
-npm run lint     # eslint
-npm run lint:fix # eslint with autofix
+npm install       # once
+npm run build     # typecheck + bundle src/ -> code.js
+npm run typecheck # tsc, no emit
+npm run watch     # rebundle on every save
+npm run lint      # eslint
+npm run lint:fix  # eslint with autofix
 ```
 
-`code.js` is generated and is gitignored — always edit `code.ts`.
+`code.js` is generated (bundled by [esbuild](https://esbuild.github.io/)) and is
+gitignored — always edit the sources under `src/`, never `code.js` directly.
 
 After rebuilding, reload the plugin in Figma to pick up your changes:
 **Plugins → Development → right-click the plugin → Reload plugin**. Editing `manifest.json`
@@ -237,14 +240,19 @@ requires a full re-import rather than a reload.
 
 ### Layout
 
-| File | Purpose |
+| Path | Purpose |
 | --- | --- |
-| `code.ts` | Plugin source — the `figma.codegen.on('generate', …)` handler |
-| `code.js` | Compiled output that Figma loads (generated) |
+| `src/main.ts` | Entry point — the `figma.codegen.on('generate', …)` handler |
+| `src/serialize.ts` | Ties the extract + refine phases together into the two codegen outputs |
+| `src/extract/` | Phase 1 — walks the scene graph into a plain JSON tree (`walk.ts`, plus paint/layout/effects/text helpers) |
+| `src/refine/` | Phase 2 — ordered passes over that tree: `tokens.ts`, `sizes.ts`, `components.ts`, `polish.ts` |
+| `src/config.ts` | Tunable limits and feature flags |
+| `src/types.ts`, `src/format.ts` | Shared JSON types and formatting helpers |
+| `code.js` | Bundled output that Figma loads (generated, gitignored) |
 | `manifest.json` | Plugin config: Dev Mode only, codegen capability, the two language options |
-| `tsconfig.json` | TypeScript config (strict) |
+| `tsconfig.json` | TypeScript config (strict, type-checking only — bundling is esbuild's job) |
 | `eslint.config.js` | Lint rules, including Figma's plugin rules |
 
 The two entries under `codegenLanguages` in `manifest.json` are what populate the Inspect
-panel dropdown. Their `value` (`summary` and `rest`) is what the handler branches on via
-`event.language`, so if you rename one, update `code.ts` to match.
+panel dropdown. Their `value` (`summary` and `rest`) is what the handler in `src/main.ts`
+branches on via `event.language`, so if you rename one, update it to match.

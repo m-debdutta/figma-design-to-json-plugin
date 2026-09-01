@@ -31,6 +31,7 @@ plugin.
 1. Build it once (see [Development](#development) if you have not run `npm install` yet):
 
    ```bash
+   cd plugin
    npm install
    npm run build
    ```
@@ -40,7 +41,7 @@ plugin.
 
 2. In the Figma desktop app, open any design file.
 3. Go to **Plugins → Development → Import plugin from manifest…**
-4. Select the `manifest.json` in this folder.
+4. Select the `manifest.json` in the `plugin` folder.
 
 The plugin now appears under **Plugins → Development** as *Design to Json - TW*.
 
@@ -216,9 +217,11 @@ The knobs all live together at the top of `code.ts`:
 
 ## Development
 
-Requires [Node.js](https://nodejs.org/en/download/).
+Requires [Node.js](https://nodejs.org/en/download/). All commands run from the `plugin`
+directory.
 
 ```bash
+cd plugin
 npm install      # once
 npm run build    # compile code.ts -> code.js
 npm run watch    # recompile on every save

@@ -1,0 +1,29 @@
+{
+  "name": "Design to Json - TW",
+  "id": "1675254231979265645",
+  "api": "1.0.0",
+  "main": "code.js",
+  "capabilities": [
+    "codegen"
+  ],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "editorType": [
+    "dev"
+  ],
+  "codegenLanguages": [
+    {
+      "label": "JSON (Summary)",
+      "value": "summary"
+    },
+    {
+      "label": "JSON (Figma REST)",
+      "value": "rest"
+    }
+  ],
+  "networkAccess": {
+    "allowedDomains": [
+      "none"
+    ]
+  }
+}
